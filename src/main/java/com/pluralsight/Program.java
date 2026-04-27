@@ -1,6 +1,5 @@
 package com.pluralsight;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.BufferedReader;
