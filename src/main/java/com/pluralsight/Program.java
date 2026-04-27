@@ -28,13 +28,13 @@ public class Program {
 
         while (isRunning) { //loops forever until user picks x
             System.out.println("""
-                    *----------------------------*
-                    * What would you like to do? *
-                    * D) Add deposit             *
-                    * P) Make Payment (Debit)    *
-                    * L) Ledger                  *
-                    * X) Exit                    *
-                    *----------------------------*""");
+                    *----------------------------------------------*
+                    *          What would you like to do?          *
+                    *             D) Add deposit                   *
+                    *             P) Make Payment (Debit)          *
+                    *             L) Ledger                        *
+                    *             X) Exit                          *
+                    *----------------------------------------------*""");
             System.out.print("Choose your option: ");
             String mainCommand = input.nextLine();
 
@@ -131,8 +131,6 @@ public class Program {
             System.out.println("Sorry, we could not read your transaction.");
         }
         System.out.println("Deposit recorded!🐾");
-
-
     }
 
     public static void makePayment(){
@@ -156,7 +154,6 @@ public class Program {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("That's not a number😾Please try again");
-
             }
         }  while (!isValid);
         amount = -amount;
@@ -184,7 +181,77 @@ public class Program {
     }
 
     public static void displayLedger(){
-        System.out.println("display the ledger screen");
-        System.out.println("account history method");
+        boolean isLedgerRunning = true;
+
+        while (isLedgerRunning) {
+            System.out.println("""
+                    *-------------------------------------------------*
+                    *          What would you like to see?            *
+                    *                  A) All                         *
+                    *                  D) Deposits                    *
+                    *                  P) Payments                    *
+                    *                  R) Reports                     *
+                    *                  H) Home                        *
+                    *-------------------------------------------------*
+                    """);
+            System.out.print("Choose your option: ");
+            String userCommand = input.nextLine();
+            switch (userCommand.toUpperCase()) { //.toUpperCase() converts user input to uppercase
+                case "A" -> displayEntries();
+
+                case "D" -> displayDeposits();
+
+                case "P" -> displayPayments();
+
+                case "R" -> {
+                    displayReports();
+
+                }
+
+                case "H" -> {
+                    System.out.println("Returning to main menu 🐾🐾🐾");
+                    isLedgerRunning = false;
+
+                }
+
+                default -> System.out.println("We don't recognize this character, try again. 🐶");
+            }
+        }
+
     }
+    public static void displayEntries(){
+        System.out.println("Display all entries");
+    }
+    public static void displayDeposits(){
+        System.out.println("Displaying deposits");
+    }
+    public static void displayPayments(){
+        System.out.println("Displaying Payments");
+    }
+    public static void displayReports(){
+        System.out.println("Displaying reports");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
