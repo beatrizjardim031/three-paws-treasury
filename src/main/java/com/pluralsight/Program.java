@@ -84,8 +84,6 @@ public class Program {
             System.out.println("Could not load transaction file😿");
         }
 
-
-
     }// Reads transactions.csv and fills the 'transactions' ArrayList.
 
     public static void addDeposit(){
@@ -138,7 +136,51 @@ public class Program {
     }
 
     public static void makePayment(){
-        System.out.println("Make payment");
+
+        System.out.print("Enter the description: ");
+        String description = input.nextLine();
+        System.out.print("Enter the vendor: ");
+        String vendor = input.nextLine();
+
+        double amount = 0;
+        boolean isValid = false;
+        do {
+            try {
+                System.out.print("Enter the amount: ");
+                amount = Double.parseDouble(input.nextLine());
+
+                if (amount > 0) {
+                    isValid = true;
+                } else {
+                    System.out.println("Amount must be pawsitive 🐾");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("That's not a number😾Please try again");
+
+            }
+        }  while (!isValid);
+        amount = -amount;
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.now();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = time.format(fmt);
+
+        transactions.add(new Transaction(date, time, description, vendor,amount));
+
+        try {
+            FileWriter fileWriter = new FileWriter("transactions.csv", true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            String csv = String.format("%s|%s|%s|%s|%.2f%n", date, formattedTime, description, vendor, amount);
+            bufferedWriter.write(csv);
+
+
+
+            bufferedWriter.close();
+        } catch (IOException e) {
+            System.out.println("Sorry, we could not read your transaction.");
+        }
+        System.out.println("Payment recorded!🐾");
     }
 
     public static void displayLedger(){
