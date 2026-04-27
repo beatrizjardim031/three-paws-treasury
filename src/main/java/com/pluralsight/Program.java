@@ -220,13 +220,45 @@ public class Program {
 
     }
     public static void displayEntries(){
-        System.out.println("Display all entries");
+
+        for(int i = transactions.size()-1;i >= 0; i--) {
+            Transaction transaction = transactions.get(i);
+            System.out.println("---------------------------------------------------------------------------------------------------");
+            System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+
+        }
+        System.out.println("---------------------------------------------------------------------------------------------------");
+
     }
     public static void displayDeposits(){
-        System.out.println("Displaying deposits");
+        boolean foundDeposits = false;
+        for(int i = transactions.size()-1;i >= 0; i--) {
+            Transaction transaction = transactions.get(i);
+            if (transaction.getAmount() > 0) {
+                System.out.println("---------------------------------------------------------------------------------------------------");
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                foundDeposits = true;
+            }
+        }
+        System.out.println("---------------------------------------------------------------------------------------------------");
+        if (!foundDeposits) {
+            System.out.println("No deposits found");
+        }
     }
     public static void displayPayments(){
-        System.out.println("Displaying Payments");
+        boolean foundPayments = false;
+        for(int i = transactions.size()-1;i >= 0; i--) {
+            Transaction transaction = transactions.get(i);
+            if (transaction.getAmount() < 0) {
+                System.out.println("---------------------------------------------------------------------------------------------------");
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                foundPayments = true;
+            }
+        }
+        System.out.println("---------------------------------------------------------------------------------------------------");
+        if (!foundPayments) {
+            System.out.println("No payments found");
+        }
     }
     public static void displayReports(){
         System.out.println("Displaying reports");
