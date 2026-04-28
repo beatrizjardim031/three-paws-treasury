@@ -15,26 +15,26 @@ public class Program {
 
     public static void main(String[] args) {
         loadTransactions();
-        System.out.println("Loaded " + transactions.size() + " transactions!");
         boolean isRunning = true; //controls whether the menu loop keeps running
 
-//        System.out.print("""
-//                                  |\__/'|   (`(
-//                               _.|o o   |_   ) )
-//                         *--(((---(((---------------------*
-//                         * WELCOME TO THREE PAWS TREASURY *
-//                         * -Pet Account Management System *
-//                         *--------------------------------*""");
+        System.out.print("""
+                                                 |\\__/'|   (`(
+                                              _.|o o   |_   ) )
+                                        *--(((---(((---------------------*
+                                        * WELCOME TO THREE PAWS TREASURY *
+                                        * -Pet Account Management System *
+                                        *--------------------------------*
+                                 """);
 
         while (isRunning) { //loops forever until user picks x
             System.out.println("""
-                    *----------------------------------------------*
-                    *          What would you like to do?          *
-                    *             D) Add deposit                   *
-                    *             P) Make Payment (Debit)          *
-                    *             L) Ledger                        *
-                    *             X) Exit                          *
-                    *----------------------------------------------*""");
+                    ╔----------------------------------------------╗
+                    │          What would you like to do?          │
+                    │             D) Add deposit                   │
+                    │             P) Make Payment (Debit)          │
+                    │             L) Ledger                        │
+                    │             X) Exit                          │
+                    ╚----------------------------------------------╝""");
             System.out.print("Choose your option: ");
             String mainCommand = input.nextLine();
 
@@ -48,7 +48,17 @@ public class Program {
                 case "L" -> displayLedger();
 
                 case "X" -> {
-                    System.out.println("Until next time!🐾");
+                    System.out.print("""
+                                                /\\___/\\
+                                                `)9 9('
+                                                {_:Y:.}_
+                            *------------------( ) U-'( )--------------------*
+                            *                   ```   ```                    *
+                            *     Thank you for using Three Paws Treasury!   *
+                            *               Until next time!🐾               *
+                            *                                                *
+                            *------------------------------------------------*
+                            """);
                     isRunning = false;
 
                 }
@@ -114,8 +124,9 @@ public class Program {
         LocalTime time = LocalTime.now();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = time.format(fmt);
+        LocalTime cleanTime = LocalTime.parse(formattedTime);
 
-        transactions.add(new Transaction(date, time, description, vendor,amount));
+        transactions.add(new Transaction(date, cleanTime, description, vendor,amount));
 
         try {
             FileWriter fileWriter = new FileWriter("transactions.csv", true);
@@ -123,8 +134,6 @@ public class Program {
 
             String csv = String.format("%s|%s|%s|%s|%.2f%n", date, formattedTime, description, vendor, amount);
             bufferedWriter.write(csv);
-
-
 
             bufferedWriter.close();
         } catch (IOException e) {
@@ -161,8 +170,9 @@ public class Program {
         LocalTime time = LocalTime.now();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = time.format(fmt);
+        LocalTime cleanTime = LocalTime.parse(formattedTime);
 
-        transactions.add(new Transaction(date, time, description, vendor,amount));
+        transactions.add(new Transaction(date, cleanTime, description, vendor,amount));
 
         try {
             FileWriter fileWriter = new FileWriter("transactions.csv", true);
@@ -186,12 +196,12 @@ public class Program {
         while (isLedgerRunning) {
             System.out.println("""
                     ╔─────────────────────────────────────────────────╗
-                    *          What would you like to see?            *
-                    *                  A) All                         *
-                    *                  D) Deposits                    *
-                    *                  P) Payments                    *
-                    *                  R) Reports                     *
-                    *                  H) Home                        *
+                    │          What would you like to see?            │
+                    │                  A) All                         │
+                    │                  D) Deposits                    │
+                    │                  P) Payments                    │
+                    │                  R) Reports                     │
+                    │                  H) Home                        │
                     ╚─────────────────────────────────────────────────╝
                     """);
             System.out.print("Choose your option: ");
@@ -203,9 +213,8 @@ public class Program {
 
                 case "P" -> displayPayments();
 
-                case "R" -> {
-                    displayReports();
-                }
+                case "R" -> displayReports();
+
                 case "H" -> {
                     System.out.println("Returning to main menu 🐾🐾🐾");
                     isLedgerRunning = false;
@@ -215,6 +224,7 @@ public class Program {
         }
 
     }
+
     public static void displayEntries(){
 
         for(int i = transactions.size()-1;i >= 0; i--) {
@@ -226,6 +236,7 @@ public class Program {
         System.out.println("---------------------------------------------------------------------------------------------------");
 
     }
+
     public static void displayDeposits(){
         boolean foundDeposits = false;
         for(int i = transactions.size()-1;i >= 0; i--) {
@@ -241,6 +252,7 @@ public class Program {
             System.out.println("No deposits found");
         }
     }
+
     public static void displayPayments(){
         boolean foundPayments = false;
         for(int i = transactions.size()-1;i >= 0; i--) {
@@ -256,6 +268,7 @@ public class Program {
             System.out.println("No payments found");
         }
     }
+
     public static void displayReports(){
         boolean isReportsRunning = true;
 
@@ -291,6 +304,7 @@ public class Program {
 
         }
     }
+
     public static void monthToDate(){
         LocalDate today = LocalDate.now();
         boolean isFound = false;
@@ -308,6 +322,7 @@ public class Program {
             System.out.println("No matches found 😿");
         }
     }
+
     public static void previousMonth(){
         LocalDate today = LocalDate.now();
         LocalDate lastMonth = today.minusMonths(1);
@@ -327,6 +342,7 @@ public class Program {
             System.out.println("No matches found 😿");
         }
     }
+
     public static void yearToDate(){
         LocalDate today = LocalDate.now();
         boolean isFound = false;
@@ -344,6 +360,7 @@ public class Program {
             System.out.println("No matches found 😿");
         }
     }
+
     public static void previousYear(){
         LocalDate today = LocalDate.now();
         boolean isFound = false;
@@ -363,6 +380,7 @@ public class Program {
             System.out.println("No matches found 😿");
         }
     }
+
     public static void searchByVendor(){
         System.out.println("══════════════════════════════════════════ Search By Vendor ═══════════════════════════════════════════");
         System.out.print("Enter vendor name: " );
@@ -380,26 +398,9 @@ public class Program {
             System.out.println("No matches found 😿");
         }
     }
+
     public static void customSearch(){
         System.out.println("Display custom search");
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
