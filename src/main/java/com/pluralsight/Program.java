@@ -19,8 +19,8 @@ public class Program {
         boolean isRunning = true; //controls whether the menu loop keeps running
 
 //        System.out.print("""
-//                              /^\__/^\   (`(
-//                            _|o o    |_   ) )
+//                                  |\__/'|   (`(
+//                               _.|o o   |_   ) )
 //                         *--(((---(((---------------------*
 //                         * WELCOME TO THREE PAWS TREASURY *
 //                         * -Pet Account Management System *
@@ -185,14 +185,14 @@ public class Program {
 
         while (isLedgerRunning) {
             System.out.println("""
-                    *-------------------------------------------------*
+                    ╔─────────────────────────────────────────────────╗
                     *          What would you like to see?            *
                     *                  A) All                         *
                     *                  D) Deposits                    *
                     *                  P) Payments                    *
                     *                  R) Reports                     *
                     *                  H) Home                        *
-                    *-------------------------------------------------*
+                    ╚─────────────────────────────────────────────────╝
                     """);
             System.out.print("Choose your option: ");
             String userCommand = input.nextLine();
@@ -205,15 +205,11 @@ public class Program {
 
                 case "R" -> {
                     displayReports();
-
                 }
-
                 case "H" -> {
                     System.out.println("Returning to main menu 🐾🐾🐾");
                     isLedgerRunning = false;
-
                 }
-
                 default -> System.out.println("We don't recognize this character, try again. 🐶");
             }
         }
@@ -261,12 +257,68 @@ public class Program {
         }
     }
     public static void displayReports(){
-        System.out.println("Displaying reports");
+        boolean isReportsRunning = true;
+
+        while(isReportsRunning) {
+            System.out.println("""
+                    ╔─────────────────────────────────────────────────╗
+                    │        How would you like to search by?         │
+                    │                1) Month To Date                 │
+                    │                2) Previous Month                │
+                    │                3) Year To Date                  │
+                    │                4) Previous Year                 │
+                    │                5) Search by Vendor              │
+                    │                0) Back                          │
+                    ╚─────────────────────────────────────────────────╝
+                    """);
+            System.out.print("Choose your option: ");
+            String userCommand = input.nextLine();
+
+            switch(userCommand) {
+                case "1" -> monthToDate();
+                case "2" -> previousMonth();
+                case "3" -> yearToDate();
+                case "4" -> previousYear();
+                case "5" -> searchByVendor();
+                case "0" -> {
+                    System.out.println("Going back to ledger page 🐾🐾🐾");
+                    isReportsRunning = false;
+                }
+                default -> System.out.println("We don't recognize this character, try again. 🐶");
+            }
+
+
+        }
     }
+    public static void monthToDate(){
+        LocalDate today = LocalDate.now();
 
+        System.out.println("══════════════════════════════════════════ Month To Date ═══════════════════════════════════════════════");
+        for (int i = transactions.size()-1;i >= 0; i--){
+            Transaction transaction = transactions.get(i);
+            LocalDate transactionDate = transaction.getDate();
+            if (transactionDate.getYear() == today.getYear() && transactionDate.getMonthValue() == today.getMonthValue()) {
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
 
+            }
+        }
+    }
+    public static void previousMonth(){
+        System.out.println("Searching by previous month");
 
+    }
+    public static void yearToDate(){
+        System.out.println("Searching by year to date");
 
+    }
+    public static void previousYear(){
+        System.out.println("Searching by previous year");
+
+    }
+    public static void searchByVendor(){
+        System.out.println("Searching by vendor");
+
+    }
 
 
 
