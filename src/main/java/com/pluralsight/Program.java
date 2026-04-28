@@ -268,6 +268,7 @@ public class Program {
                     │                3) Year To Date                  │
                     │                4) Previous Year                 │
                     │                5) Search by Vendor              │
+                    │                6) Custom Search                 │
                     │                0) Back                          │
                     ╚─────────────────────────────────────────────────╝
                     """);
@@ -280,6 +281,7 @@ public class Program {
                 case "3" -> yearToDate();
                 case "4" -> previousYear();
                 case "5" -> searchByVendor();
+                case "6" -> customSearch();
                 case "0" -> {
                     System.out.println("Going back to ledger page 🐾🐾🐾");
                     isReportsRunning = false;
@@ -287,37 +289,99 @@ public class Program {
                 default -> System.out.println("We don't recognize this character, try again. 🐶");
             }
 
-
         }
     }
     public static void monthToDate(){
         LocalDate today = LocalDate.now();
-
+        boolean isFound = false;
         System.out.println("══════════════════════════════════════════ Month To Date ═══════════════════════════════════════════════");
         for (int i = transactions.size()-1;i >= 0; i--){
             Transaction transaction = transactions.get(i);
             LocalDate transactionDate = transaction.getDate();
             if (transactionDate.getYear() == today.getYear() && transactionDate.getMonthValue() == today.getMonthValue()) {
                 System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
-
+                isFound = true;
             }
+
+        }
+        if (!isFound) {
+            System.out.println("No matches found 😿");
         }
     }
     public static void previousMonth(){
-        System.out.println("Searching by previous month");
+        LocalDate today = LocalDate.now();
+        LocalDate lastMonth = today.minusMonths(1);
+        boolean isFound = false;
 
+        System.out.println("═════════════════════════════════════════ Previous Month ═════════════════════════════════════════════");
+        for (int i = transactions.size()-1;i >= 0; i--){
+            Transaction transaction = transactions.get(i);
+            LocalDate transactionDate = transaction.getDate();
+
+            if (transactionDate.getYear() == lastMonth.getYear() && transactionDate.getMonthValue() == lastMonth.getMonthValue()) {
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                isFound = true;
+            }
+        }
+        if (!isFound) {
+            System.out.println("No matches found 😿");
+        }
     }
     public static void yearToDate(){
-        System.out.println("Searching by year to date");
+        LocalDate today = LocalDate.now();
+        boolean isFound = false;
+        System.out.println("═════════════════════════════════════════ Year To Date ═════════════════════════════════════════════");
+        for (int i = transactions.size()-1;i >= 0; i--){
+            Transaction transaction = transactions.get(i);
+            LocalDate transactionDate = transaction.getDate();
 
+            if (transactionDate.getYear() == today.getYear()) {
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                isFound = true;
+            }
+        }
+        if (!isFound) {
+            System.out.println("No matches found 😿");
+        }
     }
     public static void previousYear(){
-        System.out.println("Searching by previous year");
+        LocalDate today = LocalDate.now();
+        boolean isFound = false;
 
+        System.out.println("═════════════════════════════════════════ Previous Year ════════════════════════════════════════════");
+        for (int i = transactions.size()-1;i >= 0; i--){
+
+            Transaction transaction = transactions.get(i);
+            LocalDate transactionDate = transaction.getDate();
+            if (transactionDate.getYear() == today.getYear() - 1) {
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                isFound = true;
+            }
+
+        }
+        if (!isFound) {
+            System.out.println("No matches found 😿");
+        }
     }
     public static void searchByVendor(){
-        System.out.println("Searching by vendor");
+        System.out.println("══════════════════════════════════════════ Search By Vendor ═══════════════════════════════════════════");
+        System.out.print("Enter vendor name: " );
+        String vendorName = input.nextLine();
+        boolean isFound = false;
 
+        for (int i = transactions.size()-1;i >= 0; i--){
+            Transaction transaction = transactions.get(i);
+            if (transaction.getVendor().equalsIgnoreCase(vendorName)) {
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                isFound = true;
+            }
+        }
+        if (!isFound) {
+            System.out.println("No matches found 😿");
+        }
+    }
+    public static void customSearch(){
+        System.out.println("Display custom search");
     }
 
 
