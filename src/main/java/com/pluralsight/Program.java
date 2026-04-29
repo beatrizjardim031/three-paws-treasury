@@ -41,9 +41,9 @@ public class Program {
             //switch case for checking choices
 
             switch (mainCommand.toUpperCase()) { //.toUpperCase() converts user input to uppercase
-                case "D" -> addDeposit();
+                case "D" -> addTransaction(true);
 
-                case "P" -> makePayment();
+                case "P" -> addTransaction(false);
 
                 case "L" -> displayLedger();
 
@@ -96,96 +96,32 @@ public class Program {
 
     }// Reads transactions.csv and fills the 'transactions' ArrayList.
 
-    public static void addDeposit(){
+    public static void addTransaction(boolean isDeposit) {
+        String description = askForText("Enter the description: ");
+        String vendor = askForText("Enter the vendor: ");
+        double amount = getPositiveAmount();
 
-        System.out.print("Enter the description: ");
-        String description = input.nextLine();
-        System.out.print("Enter the vendor: ");
-        String vendor = input.nextLine();
-
-        double amount = 0;
-        boolean isValid = false;
-      do {
-          try {
-              System.out.print("Enter the amount: ");
-              amount = Double.parseDouble(input.nextLine());
-
-              if (amount > 0) {
-                  isValid = true;
-              } else {
-                  System.out.println("Amount must be pawsitive 🐾");
-              }
-          } catch (NumberFormatException e) {
-              System.out.println("That's not a number😾Please try again");
-
-          }
-      }  while (!isValid);
+        if (!isDeposit) {
+            amount = -amount;
+        }
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String formattedTime = time.format(fmt);
-        LocalTime cleanTime = LocalTime.parse(formattedTime);
+        LocalTime cleanTime = time.withNano(0);
 
         Transaction transaction = new Transaction(date, cleanTime, description, vendor, amount);
         transactions.add(transaction);
 
-        try {
-            FileWriter fileWriter = new FileWriter("transactions.csv", true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        boolean saved = saveTransaction(transaction);
+        if (saved) {
+            if (isDeposit) {
+                System.out.println("Deposit recorded!🐾");
 
-            bufferedWriter.write(transaction.toCsv());
-
-            bufferedWriter.close();
-        } catch (IOException e) {
-            System.out.println("Sorry, we could not read your transaction.");
-        }
-        System.out.println("Deposit recorded!🐾");
-    }
-
-    public static void makePayment(){
-
-        System.out.print("Enter the description: ");
-        String description = input.nextLine();
-        System.out.print("Enter the vendor: ");
-        String vendor = input.nextLine();
-
-        double amount = 0;
-        boolean isValid = false;
-        do {
-            try {
-                System.out.print("Enter the amount: ");
-                amount = Double.parseDouble(input.nextLine());
-
-                if (amount > 0) {
-                    isValid = true;
-                } else {
-                    System.out.println("Amount must be pawsitive 🐾\n");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("That's not a number😾Please try again");
+            } else {
+                System.out.println("Payment recorded!🐾");
             }
-        }  while (!isValid);
-        amount = -amount;
-        LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String formattedTime = time.format(fmt);
-        LocalTime cleanTime = LocalTime.parse(formattedTime);
-
-        Transaction transaction = new Transaction(date, cleanTime, description, vendor, amount);
-        transactions.add(transaction);
-
-        try {
-            FileWriter fileWriter = new FileWriter("transactions.csv", true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-            bufferedWriter.write(transaction.toCsv());
-
-            bufferedWriter.close();
-        } catch (IOException e) {
-            System.out.println("Sorry, we could not read your transaction.");
+        } else {
+            System.out.println("Failed to save");
         }
-        System.out.println("Payment recorded!🐾");
     }
 
     public static void displayLedger(){
@@ -227,7 +163,7 @@ public class Program {
         for(int i = transactions.size()-1;i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             System.out.println("---------------------------------------------------------------------------------------------------");
-            System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+            printTransaction(transaction);
         }
         System.out.println("---------------------------------------------------------------------------------------------------");
 
@@ -239,7 +175,7 @@ public class Program {
             Transaction transaction = transactions.get(i);
             if (transaction.getAmount() > 0) {
                 System.out.println("---------------------------------------------------------------------------------------------------");
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 foundDeposits = true;
             }
         }
@@ -255,7 +191,7 @@ public class Program {
             Transaction transaction = transactions.get(i);
             if (transaction.getAmount() < 0) {
                 System.out.println("---------------------------------------------------------------------------------------------------");
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 foundPayments = true;
             }
         }
@@ -307,8 +243,9 @@ public class Program {
         for (int i = transactions.size()-1;i >= 0; i--){
             Transaction transaction = transactions.get(i);
             LocalDate transactionDate = transaction.getDate();
+
             if (transactionDate.getYear() == today.getYear() && transactionDate.getMonthValue() == today.getMonthValue()) {
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 isFound = true;
             }
         }
@@ -328,7 +265,7 @@ public class Program {
             LocalDate transactionDate = transaction.getDate();
 
             if (transactionDate.getYear() == lastMonth.getYear() && transactionDate.getMonthValue() == lastMonth.getMonthValue()) {
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 isFound = true;
             }
         }
@@ -346,7 +283,7 @@ public class Program {
             LocalDate transactionDate = transaction.getDate();
 
             if (transactionDate.getYear() == today.getYear()) {
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 isFound = true;
             }
         }
@@ -365,10 +302,9 @@ public class Program {
             Transaction transaction = transactions.get(i);
             LocalDate transactionDate = transaction.getDate();
             if (transactionDate.getYear() == today.getYear() - 1) {
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 isFound = true;
             }
-
         }
         if (!isFound) {
             System.out.println("No matches found 😿");
@@ -384,7 +320,7 @@ public class Program {
         for (int i = transactions.size()-1;i >= 0; i--){
             Transaction transaction = transactions.get(i);
             if (transaction.getVendor().toLowerCase().contains(vendorName.toLowerCase())) {
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 isFound = true;
             }
         }
@@ -419,7 +355,6 @@ public class Program {
                     if (transaction.getDate().isBefore(startDate)) {
                         match = false;
                     }
-
                 }
                 if (!endDateUser.isEmpty()) {
                     LocalDate endDate = LocalDate.parse(endDateUser);
@@ -432,12 +367,9 @@ public class Program {
             }
             if (!description.isEmpty() && !transaction.getDescription().toLowerCase().contains(description.toLowerCase())) {
                 match = false;
-
-
             }
             if (!vendor.isEmpty() && !transaction.getVendor().toLowerCase().contains(vendor.toLowerCase())) {
                 match = false;
-
             }
             try {
                 if (!amountUser.isEmpty()) {
@@ -445,17 +377,63 @@ public class Program {
                     if (transaction.getAmount() != amount) {
                         match = false;
                     }
-
                 }
             } catch (NumberFormatException e) {
                 System.out.println("That's not a number 😾 Please try again");
             }
             if (match) {
-                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                printTransaction(transaction);
                 isFound = true;
             }
-
         } if (!isFound) { System.out.println("No matches found 😿");}
+    }
+
+    public static void printTransaction(Transaction transaction) {
+        System.out.printf("| %s | %s | %-30s | %-25s | $%10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+
+    }
+
+    public static String askForText(String prompt) {
+        System.out.print(prompt);
+        return input.nextLine();
+    }
+    // helper methods
+    public static double getPositiveAmount() {
+        double amount = 0;
+        boolean isValid = false;
+        do {
+            try {
+                System.out.print("Enter the amount: ");
+                amount = Double.parseDouble(input.nextLine());
+
+                if (amount > 0) {
+                    isValid = true;
+                } else {
+                    System.out.println("Amount must be pawsitive 🐾");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("That's not a number😾Please try again");
+
+            }
+        }  while (!isValid);
+        return amount;
+    }
+
+    public static boolean saveTransaction(Transaction transaction) {
+
+        try {
+            FileWriter fileWriter = new FileWriter("transactions.csv", true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            bufferedWriter.write(transaction.toCsv());
+
+            bufferedWriter.close();
+            return true;
+        } catch (IOException e) {
+            System.out.println("Sorry, we could not read your transaction.");
+            return false;
+        }
+
 
     }
 }
