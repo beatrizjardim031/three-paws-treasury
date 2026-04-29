@@ -126,14 +126,14 @@ public class Program {
         String formattedTime = time.format(fmt);
         LocalTime cleanTime = LocalTime.parse(formattedTime);
 
-        transactions.add(new Transaction(date, cleanTime, description, vendor,amount));
+        Transaction transaction = new Transaction(date, cleanTime, description, vendor, amount);
+        transactions.add(transaction);
 
         try {
             FileWriter fileWriter = new FileWriter("transactions.csv", true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            String csv = String.format("%s|%s|%s|%s|%.2f%n", date, formattedTime, description, vendor, amount);
-            bufferedWriter.write(csv);
+            bufferedWriter.write(transaction.toCsv());
 
             bufferedWriter.close();
         } catch (IOException e) {
@@ -159,7 +159,7 @@ public class Program {
                 if (amount > 0) {
                     isValid = true;
                 } else {
-                    System.out.println("Amount must be pawsitive 🐾");
+                    System.out.println("Amount must be pawsitive 🐾\n");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("That's not a number😾Please try again");
@@ -172,16 +172,14 @@ public class Program {
         String formattedTime = time.format(fmt);
         LocalTime cleanTime = LocalTime.parse(formattedTime);
 
-        transactions.add(new Transaction(date, cleanTime, description, vendor,amount));
+        Transaction transaction = new Transaction(date, cleanTime, description, vendor, amount);
+        transactions.add(transaction);
 
         try {
             FileWriter fileWriter = new FileWriter("transactions.csv", true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            String csv = String.format("%s|%s|%s|%s|%.2f%n", date, formattedTime, description, vendor, amount);
-            bufferedWriter.write(csv);
-
-
+            bufferedWriter.write(transaction.toCsv());
 
             bufferedWriter.close();
         } catch (IOException e) {
@@ -194,7 +192,7 @@ public class Program {
         boolean isLedgerRunning = true;
 
         while (isLedgerRunning) {
-            System.out.println("""
+            System.out.println("""            
                     ╔─────────────────────────────────────────────────╗
                     │          What would you like to see?            │
                     │                  A) All                         │
@@ -222,7 +220,6 @@ public class Program {
                 default -> System.out.println("We don't recognize this character, try again. 🐶");
             }
         }
-
     }
 
     public static void displayEntries(){
@@ -231,7 +228,6 @@ public class Program {
             Transaction transaction = transactions.get(i);
             System.out.println("---------------------------------------------------------------------------------------------------");
             System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
-
         }
         System.out.println("---------------------------------------------------------------------------------------------------");
 
@@ -274,16 +270,16 @@ public class Program {
 
         while(isReportsRunning) {
             System.out.println("""
-                    ╔─────────────────────────────────────────────────╗
-                    │        How would you like to search by?         │
-                    │                1) Month To Date                 │
-                    │                2) Previous Month                │
-                    │                3) Year To Date                  │
-                    │                4) Previous Year                 │
-                    │                5) Search by Vendor              │
-                    │                6) Custom Search                 │
-                    │                0) Back                          │
-                    ╚─────────────────────────────────────────────────╝
+                     ╔─────────────────────────────────────────────────╗
+                     │        How would you like to search by?         │
+                     │                1) Month To Date                 │
+                     │                2) Previous Month                │
+                     │                3) Year To Date                  │
+                     │                4) Previous Year                 │
+                     │                5) Search by Vendor              │
+                     │                6) Custom Search                 │
+                     │                0) Back                          │
+                     ╚─────────────────────────────────────────────────╝
                     """);
             System.out.print("Choose your option: ");
             String userCommand = input.nextLine();
@@ -301,7 +297,6 @@ public class Program {
                 }
                 default -> System.out.println("We don't recognize this character, try again. 🐶");
             }
-
         }
     }
 
@@ -316,7 +311,6 @@ public class Program {
                 System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
                 isFound = true;
             }
-
         }
         if (!isFound) {
             System.out.println("No matches found 😿");
@@ -389,7 +383,7 @@ public class Program {
 
         for (int i = transactions.size()-1;i >= 0; i--){
             Transaction transaction = transactions.get(i);
-            if (transaction.getVendor().equalsIgnoreCase(vendorName)) {
+            if (transaction.getVendor().toLowerCase().contains(vendorName.toLowerCase())) {
                 System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
                 isFound = true;
             }
@@ -400,7 +394,68 @@ public class Program {
     }
 
     public static void customSearch(){
-        System.out.println("Display custom search");
-    }
+        System.out.println("══════════════════════════════════════════ Custom Search ═══════════════════════════════════════════");
+        System.out.println("Press Enter to skip a filter 🐶");
+        System.out.print("Start date (YYYY-MM-DD): ");
+        String startDateUser = input.nextLine();
+        System.out.print("End Date (YYYY-MM-DD): ");
+        String endDateUser = input.nextLine();
+        System.out.print("Description: ");
+        String description = input.nextLine();
+        System.out.print("Vendor: ");
+        String vendor = input.nextLine();
+        System.out.print("Amount: ");
+        String amountUser = input.nextLine();
 
+        boolean isFound = false;
+
+        for (int i = transactions.size()-1;i >= 0; i--) {
+            Transaction transaction = transactions.get(i);
+            boolean match = true;
+
+            try {
+                if (!startDateUser.isEmpty()) {
+                    LocalDate startDate = LocalDate.parse(startDateUser);
+                    if (transaction.getDate().isBefore(startDate)) {
+                        match = false;
+                    }
+
+                }
+                if (!endDateUser.isEmpty()) {
+                    LocalDate endDate = LocalDate.parse(endDateUser);
+                    if (transaction.getDate().isAfter(endDate)) {
+                        match = false;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Please input the correct date 😺");
+            }
+            if (!description.isEmpty() && !transaction.getDescription().toLowerCase().contains(description.toLowerCase())) {
+                match = false;
+
+
+            }
+            if (!vendor.isEmpty() && !transaction.getVendor().toLowerCase().contains(vendor.toLowerCase())) {
+                match = false;
+
+            }
+            try {
+                if (!amountUser.isEmpty()) {
+                    double amount = Double.parseDouble(amountUser);
+                    if (transaction.getAmount() != amount) {
+                        match = false;
+                    }
+
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("That's not a number 😾 Please try again");
+            }
+            if (match) {
+                System.out.printf("| %s | %s | %-30s | %-25s | %10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
+                isFound = true;
+            }
+
+        } if (!isFound) { System.out.println("No matches found 😿");}
+
+    }
 }
