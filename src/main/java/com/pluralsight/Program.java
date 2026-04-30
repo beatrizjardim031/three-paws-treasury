@@ -217,10 +217,10 @@ public class Program {
             String userCommand = input.nextLine();
 
             switch(userCommand) {
-                case "1" -> displayDates("Month To Date");
-                case "2" -> displayDates("Previous Month");
-                case "3" -> displayDates("Year To Date");
-                case "4" -> displayDates("Previous Year");
+                case "1" -> displayReportsByDate("Month To Date");
+                case "2" -> displayReportsByDate("Previous Month");
+                case "3" -> displayReportsByDate("Year To Date");
+                case "4" -> displayReportsByDate("Previous Year");
                 case "5" -> searchByVendor();
                 case "6" -> customSearch();
                 case "0" -> {
@@ -236,7 +236,7 @@ public class Program {
         }
     }
     // displays reports based on a date category
-    public static void displayDates(String dateType) {
+    public static void displayReportsByDate(String dateType) {
         boolean isFound = false; // tracks if any of the matching dateTypes was found
         header(dateType);
         for (int i = transactions.size()-1;i >= 0; i--) {
@@ -286,7 +286,7 @@ public class Program {
         String vendor = askForText("Vendor: ");
         String amountUser = askForText("Amount: ");
 
-        // I used null to mean the user  skipped this line
+        // I used null to mean the user skipped this line
         boolean isFound = false;
         LocalDate startDate = null;
         LocalDate endDate = null;
@@ -372,7 +372,7 @@ public class Program {
         System.out.println("═════════════════════════════════════════ " + title + " ════════════════════════════════════════════");
     }
 
-    // date helper methods for displayDates()
+    // date helper methods for displayReportsByDate()
     public static boolean isMonthToDate (Transaction transaction) { //checks if a transaction happened in the current month and current year
         LocalDate today = LocalDate.now();
         LocalDate transactionDate = transaction.getDate();
@@ -405,7 +405,6 @@ public class Program {
 
     // this method checks one transaction against all custom search filters
     public static boolean matchesCustomSearch(Transaction transaction, LocalDate startDate, LocalDate endDate, String description, String vendor, Double amount) {
-
             if (startDate != null && transaction.getDate().isBefore(startDate)) {
                 return false;
             }
