@@ -18,13 +18,13 @@ public class Program {
         boolean isRunning = true; //controls whether the menu loop keeps running
 
         System.out.print("""
-                                                 |\\__/'|   (`(
-                                              _.|o o   |_   ) )
-                                        *--(((---(((---------------------*
-                                        * WELCOME TO THREE PAWS TREASURY *
-                                        * -Pet Account Management System *
-                                        *--------------------------------*
-                                 """);
+                                   |\\__/'|   (`(
+                                _.|o o   |_   ) )
+                        *--(((---(((---------------------*
+                        * WELCOME TO THREE PAWS TREASURY *
+                        * -Pet Account Management System *
+                        *--------------------------------*
+                 """);
 
         while (isRunning) { //loops forever until user picks x
             System.out.println("""
@@ -34,7 +34,8 @@ public class Program {
                     │             P) Make Payment (Debit)          │
                     │             L) Ledger                        │
                     │             X) Exit                          │
-                    ╚----------------------------------------------╝""");
+                    ╚----------------------------------------------╝
+                    """);
             System.out.print("Choose your option: ");
             String mainCommand = input.nextLine();
 
@@ -150,7 +151,11 @@ public class Program {
                 case "R" -> displayReports();
 
                 case "H" -> {
-                    System.out.println("Returning to main menu 🐾🐾🐾");
+                    System.out.println("""
+                                         ╔────────────────────────────────╗
+                                         * Returning to main menu 🐾🐾🐾 *
+                                         ╚────────────────────────────────╝
+                                  """);
                     isLedgerRunning = false;
                 }
                 default -> System.out.println("We don't recognize this character, try again. 🐶");
@@ -207,10 +212,10 @@ public class Program {
             String userCommand = input.nextLine();
 
             switch(userCommand) {
-                case "1" -> monthToDate();
-                case "2" -> previousMonth();
-                case "3" -> yearToDate();
-                case "4" -> previousYear();
+                case "1" -> displayDates("Month To Date");
+                case "2" -> displayDates("Previous Month");
+                case "3" -> displayDates("Year To Date");
+                case "4" -> displayDates("Previous Year");
                 case "5" -> searchByVendor();
                 case "6" -> customSearch();
                 case "0" -> {
@@ -222,72 +227,20 @@ public class Program {
         }
     }
 
-    public static void monthToDate(){
-        LocalDate today = LocalDate.now();
-        boolean isFound = false;
-        System.out.println("══════════════════════════════════════════ Month To Date ═══════════════════════════════════════════════");
-        for (int i = transactions.size()-1;i >= 0; i--){
-            Transaction transaction = transactions.get(i);
-            LocalDate transactionDate = transaction.getDate();
-
-            if (transactionDate.getYear() == today.getYear() && transactionDate.getMonthValue() == today.getMonthValue()) {
-                printTransaction(transaction);
-                isFound = true;
-            }
-        }
-        if (!isFound) {
-            System.out.println("No matches found 😿");
-        }
-    }
-
-    public static void previousMonth(){
-        LocalDate today = LocalDate.now();
-        LocalDate lastMonth = today.minusMonths(1);
+    public static void displayDates(String dateType) {
         boolean isFound = false;
 
-        System.out.println("═════════════════════════════════════════ Previous Month ═════════════════════════════════════════════");
-        for (int i = transactions.size()-1;i >= 0; i--){
+        for (int i = transactions.size()-1;i >= 0; i--) {
             Transaction transaction = transactions.get(i);
-            LocalDate transactionDate = transaction.getDate();
+            boolean match = switch (dateType) {
+                case "Month To Date" -> isMonthToDate(transaction);
+                case "Previous Month" -> isPreviousMonth(transaction);
+                case "Year To Date" -> isYearToDate(transaction);
+                case "Previous Year" -> isPreviousYear(transaction);
+                default -> false;
+            };
 
-            if (transactionDate.getYear() == lastMonth.getYear() && transactionDate.getMonthValue() == lastMonth.getMonthValue()) {
-                printTransaction(transaction);
-                isFound = true;
-            }
-        }
-        if (!isFound) {
-            System.out.println("No matches found 😿");
-        }
-    }
-
-    public static void yearToDate(){
-        LocalDate today = LocalDate.now();
-        boolean isFound = false;
-        System.out.println("═════════════════════════════════════════ Year To Date ═════════════════════════════════════════════");
-        for (int i = transactions.size()-1;i >= 0; i--){
-            Transaction transaction = transactions.get(i);
-            LocalDate transactionDate = transaction.getDate();
-
-            if (transactionDate.getYear() == today.getYear()) {
-                printTransaction(transaction);
-                isFound = true;
-            }
-        }
-        if (!isFound) {
-            System.out.println("No matches found 😿");
-        }
-    }
-
-    public static void previousYear(){
-        LocalDate today = LocalDate.now();
-        boolean isFound = false;
-
-        System.out.println("═════════════════════════════════════════ Previous Year ════════════════════════════════════════════");
-        for (int i = transactions.size()-1;i >= 0; i--){
-
-            Transaction transaction = transactions.get(i);
-            LocalDate transactionDate = transaction.getDate();
-            if (transactionDate.getYear() == today.getYear() - 1) {
+            if (match) {
                 printTransaction(transaction);
                 isFound = true;
             }
@@ -298,9 +251,8 @@ public class Program {
     }
 
     public static void searchByVendor(){
-        System.out.println("══════════════════════════════════════════ Search By Vendor ═══════════════════════════════════════════");
-        System.out.print("Enter vendor name: " );
-        String vendorName = input.nextLine();
+        header("Search By Vendor");
+        String vendorName = askForText("Enter vendor name: ");
         boolean isFound = false;
 
         for (int i = transactions.size()-1;i >= 0; i--){
@@ -383,7 +335,8 @@ public class Program {
         System.out.print(prompt);
         return input.nextLine();
     }
-    // helper methods
+
+    // helper/reusable methods
     public static double getPositiveAmount() {
         double amount = 0;
         boolean isValid = false;
@@ -422,4 +375,43 @@ public class Program {
 
 
     }
+
+    public static void header(String title) {
+        System.out.println("═════════════════════════════════════════ " + title + " ════════════════════════════════════════════");
+    }
+
+    public static boolean isMonthToDate (Transaction transaction) {
+        header("Search by Month To Date");
+        LocalDate today = LocalDate.now();
+        LocalDate transactionDate = transaction.getDate();
+
+        return today.getYear() == transactionDate.getYear() && today.getMonthValue() == transactionDate.getMonthValue();
+    }
+
+    public static boolean isPreviousMonth(Transaction transaction) {
+        header("Search by Previous Month");
+        LocalDate today = LocalDate.now();
+        LocalDate transactionDate = transaction.getDate();
+        LocalDate lastMonth = today.minusMonths(1);
+
+        return transactionDate.getYear() == lastMonth.getYear() && transactionDate.getMonthValue() == lastMonth.getMonthValue();
+    }
+
+    public static boolean isYearToDate(Transaction transaction) {
+        header("Search by Year To Date");
+        LocalDate today = LocalDate.now();
+        LocalDate transactionDate = transaction.getDate();
+
+        return today.getYear() == transactionDate.getYear();
+    }
+
+    public static boolean isPreviousYear(Transaction transaction) {
+        header("Search by Previous Year");
+        LocalDate today = LocalDate.now();
+        LocalDate transactionDate = transaction.getDate();
+        LocalDate lastYear = today.minusYears(1);
+
+        return transactionDate.getYear() == lastYear.getYear();
+    }
+
 }
