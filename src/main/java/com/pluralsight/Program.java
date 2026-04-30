@@ -1,12 +1,10 @@
 package com.pluralsight;
 
 import java.io.*;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.LocalTime;
 import java.time.LocalDate;
-
 
 
 public class Program {
@@ -95,7 +93,7 @@ public class Program {
             System.out.println("Could not load transaction file😿");
         }
 
-    }// Reads transactions.csv and fills the 'transactions' ArrayList.
+    } // Reads transactions.csv and fills the 'transactions' ArrayList.
 
     public static void addTransaction(boolean isDeposit) {
         String description = askForText("Enter the description: ");
@@ -115,10 +113,10 @@ public class Program {
         boolean saved = saveTransaction(transaction);
         if (saved) {
             if (isDeposit) {
-                System.out.println("Deposit recorded!🐾");
+                System.out.println("Deposit recorded!🐾\n");
 
             } else {
-                System.out.println("Payment recorded!🐾");
+                System.out.println("Payment recorded!\n🐾");
             }
         } else {
             System.out.println("Failed to save");
@@ -219,7 +217,11 @@ public class Program {
                 case "5" -> searchByVendor();
                 case "6" -> customSearch();
                 case "0" -> {
-                    System.out.println("Going back to ledger page 🐾🐾🐾");
+                    System.out.println("""
+                                     ╔───────────────────────────────────╗
+                                     * Going back to Ledger page 🐾🐾🐾 *
+                                     ╚───────────────────────────────────╝
+                             """);
                     isReportsRunning = false;
                 }
                 default -> System.out.println("We don't recognize this character, try again. 🐶");
@@ -229,7 +231,7 @@ public class Program {
 
     public static void displayDates(String dateType) {
         boolean isFound = false;
-
+        header(dateType);
         for (int i = transactions.size()-1;i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             boolean match = switch (dateType) {
@@ -268,64 +270,65 @@ public class Program {
     }
 
     public static void customSearch(){
-        System.out.println("══════════════════════════════════════════ Custom Search ═══════════════════════════════════════════");
+        header("Custom Search");
+
         System.out.println("Press Enter to skip a filter 🐶");
-        System.out.print("Start date (YYYY-MM-DD): ");
-        String startDateUser = input.nextLine();
-        System.out.print("End Date (YYYY-MM-DD): ");
-        String endDateUser = input.nextLine();
-        System.out.print("Description: ");
-        String description = input.nextLine();
-        System.out.print("Vendor: ");
-        String vendor = input.nextLine();
-        System.out.print("Amount: ");
-        String amountUser = input.nextLine();
+        String startDateUser = askForText("Start date (YYYY-MM-DD): ");
+        String endDateUser = askForText("End Date (YYYY-MM-DD): ");
+        String description = askForText("Description: ");
+        String vendor = askForText("Vendor: ");
+        String amountUser = askForText("Amount: ");
 
         boolean isFound = false;
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        Double amount = null;
 
+        try {
+            if (!startDateUser.isEmpty()) {
+                startDate = LocalDate.parse(startDateUser);
+            }
+            if (!endDateUser.isEmpty()) {
+                endDate = LocalDate.parse(endDateUser);
+            }
+            if (!amountUser.isEmpty()) {
+                amount = Double.parseDouble(amountUser);
+            }
+        } catch (Exception e) {
+            System.out.println("Please input the correct information 😺");
+            return; // so it will stop executing this method immediately
+        }
         for (int i = transactions.size()-1;i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             boolean match = true;
 
-            try {
-                if (!startDateUser.isEmpty()) {
-                    LocalDate startDate = LocalDate.parse(startDateUser);
-                    if (transaction.getDate().isBefore(startDate)) {
-                        match = false;
-                    }
+                if (startDate != null && transaction.getDate().isBefore(startDate)) {
+                    match = false;
                 }
-                if (!endDateUser.isEmpty()) {
-                    LocalDate endDate = LocalDate.parse(endDateUser);
-                    if (transaction.getDate().isAfter(endDate)) {
-                        match = false;
-                    }
+                if (endDate != null && transaction.getDate().isAfter(endDate)) {
+                    match = false;
                 }
-            } catch (Exception e) {
-                System.out.println("Please input the correct date 😺");
-            }
-            if (!description.isEmpty() && !transaction.getDescription().toLowerCase().contains(description.toLowerCase())) {
-                match = false;
-            }
-            if (!vendor.isEmpty() && !transaction.getVendor().toLowerCase().contains(vendor.toLowerCase())) {
-                match = false;
-            }
-            try {
-                if (!amountUser.isEmpty()) {
-                    double amount = Double.parseDouble(amountUser);
-                    if (transaction.getAmount() != amount) {
-                        match = false;
-                    }
+                if (!description.isEmpty() && !transaction.getDescription().toLowerCase().contains(description.toLowerCase())) {
+                    match = false;
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("That's not a number 😾 Please try again");
-            }
-            if (match) {
-                printTransaction(transaction);
-                isFound = true;
-            }
-        } if (!isFound) { System.out.println("No matches found 😿");}
+                if (!vendor.isEmpty() && !transaction.getVendor().toLowerCase().contains(vendor.toLowerCase())) {
+                    match = false;
+                }
+                if (amount != null && transaction.getAmount() != amount) {
+                    match = false;
+                }
+                if (match) {
+                    printTransaction(transaction);
+                    isFound = true;
+                }
+        }
+        if (!isFound) {
+            System.out.println("No matches found 😿");
+        }
     }
 
+
+    // helper/reusable methods
     public static void printTransaction(Transaction transaction) {
         System.out.printf("| %s | %s | %-30s | %-25s | $%10.2f |%n", transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
 
@@ -336,7 +339,6 @@ public class Program {
         return input.nextLine();
     }
 
-    // helper/reusable methods
     public static double getPositiveAmount() {
         double amount = 0;
         boolean isValid = false;
@@ -352,9 +354,9 @@ public class Program {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("That's not a number😾Please try again");
-
             }
         }  while (!isValid);
+
         return amount;
     }
 
@@ -370,9 +372,9 @@ public class Program {
             return true;
         } catch (IOException e) {
             System.out.println("Sorry, we could not read your transaction.");
+
             return false;
         }
-
 
     }
 
@@ -381,7 +383,6 @@ public class Program {
     }
 
     public static boolean isMonthToDate (Transaction transaction) {
-        header("Search by Month To Date");
         LocalDate today = LocalDate.now();
         LocalDate transactionDate = transaction.getDate();
 
@@ -389,7 +390,6 @@ public class Program {
     }
 
     public static boolean isPreviousMonth(Transaction transaction) {
-        header("Search by Previous Month");
         LocalDate today = LocalDate.now();
         LocalDate transactionDate = transaction.getDate();
         LocalDate lastMonth = today.minusMonths(1);
@@ -398,7 +398,6 @@ public class Program {
     }
 
     public static boolean isYearToDate(Transaction transaction) {
-        header("Search by Year To Date");
         LocalDate today = LocalDate.now();
         LocalDate transactionDate = transaction.getDate();
 
@@ -406,7 +405,6 @@ public class Program {
     }
 
     public static boolean isPreviousYear(Transaction transaction) {
-        header("Search by Previous Year");
         LocalDate today = LocalDate.now();
         LocalDate transactionDate = transaction.getDate();
         LocalDate lastYear = today.minusYears(1);
