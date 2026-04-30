@@ -300,27 +300,11 @@ public class Program {
         }
         for (int i = transactions.size()-1;i >= 0; i--) {
             Transaction transaction = transactions.get(i);
-            boolean match = true;
 
-                if (startDate != null && transaction.getDate().isBefore(startDate)) {
-                    match = false;
-                }
-                if (endDate != null && transaction.getDate().isAfter(endDate)) {
-                    match = false;
-                }
-                if (!description.isEmpty() && !transaction.getDescription().toLowerCase().contains(description.toLowerCase())) {
-                    match = false;
-                }
-                if (!vendor.isEmpty() && !transaction.getVendor().toLowerCase().contains(vendor.toLowerCase())) {
-                    match = false;
-                }
-                if (amount != null && transaction.getAmount() != amount) {
-                    match = false;
-                }
-                if (match) {
-                    printTransaction(transaction);
-                    isFound = true;
-                }
+            if (matchesCustomSearch(transaction, startDate, endDate, description, vendor, amount)) {
+                printTransaction(transaction);
+                isFound = true;
+            }
         }
         if (!isFound) {
             System.out.println("No matches found 😿");
@@ -410,6 +394,27 @@ public class Program {
         LocalDate lastYear = today.minusYears(1);
 
         return transactionDate.getYear() == lastYear.getYear();
+    }
+
+    public static boolean matchesCustomSearch(Transaction transaction, LocalDate startDate, LocalDate endDate, String description, String vendor, Double amount) {
+
+            if (startDate != null && transaction.getDate().isBefore(startDate)) {
+                return false;
+            }
+            if (endDate != null && transaction.getDate().isAfter(endDate)) {
+                return false;
+            }
+            if (!description.isEmpty() && !transaction.getDescription().toLowerCase().contains(description.toLowerCase())) {
+                return false;
+            }
+            if (!vendor.isEmpty() && !transaction.getVendor().toLowerCase().contains(vendor.toLowerCase())) {
+                return false;
+            }
+            if (amount != null && transaction.getAmount() != amount) {
+                return false;
+            }
+            return true;
+
     }
 
 }
