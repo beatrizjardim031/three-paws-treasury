@@ -5,7 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Transaction {
-    //fields
+    //fields, final means other classes cannot
     private final LocalDate date;
     private final LocalTime time;
     private final String description;

@@ -71,10 +71,10 @@ public class Program {
         try {
             FileReader filereader = new FileReader("transactions.csv");
             BufferedReader bufferedReader = new BufferedReader(filereader);
-            String line = bufferedReader.readLine();
+            String line = bufferedReader.readLine(); // reads the first line from the file
 
             while(line != null) {
-                if (!line.trim().isEmpty()){ //.trim() removes leading/trailing whitespace
+                if (!line.trim().isEmpty()){ //.trim() removes leading/trailing whitespace, only process if the line it's not empty
                     String[] parts = line.split("\\|");
                     LocalDate date = LocalDate.parse(parts[0]);
                     LocalTime time = LocalTime.parse(parts[1]);
@@ -82,47 +82,52 @@ public class Program {
                     String vendor = parts[3];
                     double amount = Double.parseDouble(parts[4]);
 
-                    transactions.add(new Transaction(date, time, description, vendor, amount));
+                    transactions.add(new Transaction(date, time, description, vendor, amount)); // creates a new transaction object and adds it to the list
 
                 }
 
-                line = bufferedReader.readLine();
+                line = bufferedReader.readLine(); // reads the next line
             }
             bufferedReader.close();
         } catch (IOException e) {
             System.out.println("Could not load transaction file😿");
         }
 
-    } // Reads transactions.csv and fills the 'transactions' ArrayList.
+    }
 
+    //this method handles both payments and deposits
     public static void addTransaction(boolean isDeposit) {
         String description = askForText("Enter the description: ");
         String vendor = askForText("Enter the vendor: ");
         double amount = getPositiveAmount();
 
+        //IF it's a payment, flip the amount to negative
         if (!isDeposit) {
             amount = -amount;
         }
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
-        LocalTime cleanTime = time.withNano(0);
+        LocalTime cleanTime = time.withNano(0); // removes nanoseconds
 
+        // creates the object and add it to arrayList
         Transaction transaction = new Transaction(date, cleanTime, description, vendor, amount);
         transactions.add(transaction);
 
+        //save it to file
         boolean saved = saveTransaction(transaction);
         if (saved) {
             if (isDeposit) {
                 System.out.println("Deposit recorded!🐾\n");
 
             } else {
-                System.out.println("Payment recorded!\n🐾");
+                System.out.println("Payment recorded!🐾\n");
             }
         } else {
             System.out.println("Failed to save");
         }
     }
 
+    // a loop for checking the history
     public static void displayLedger(){
         boolean isLedgerRunning = true;
 
@@ -161,21 +166,22 @@ public class Program {
         }
     }
 
+    // display transactions depending on choice
     public static void displayTransactions (String choice){
         boolean isFound = false;
-
+        // loop goes backwards so the newer transactions shows first
         for(int i = transactions.size()-1;i >= 0; i--) {
             boolean shouldPrint = false;
-            Transaction transaction = transactions.get(i);
+            Transaction transaction = transactions.get(i); // gets the current transaction at index i
 
             if (choice.equalsIgnoreCase("All")) {
                 shouldPrint = true;
             }
             else if (choice.equalsIgnoreCase("Deposit") && transaction.getAmount() > 0) {
-                shouldPrint = true;
+                shouldPrint = true; //shows only positive numbers
             }
             else if (choice.equalsIgnoreCase("Payment") && transaction.getAmount() < 0) {
-                shouldPrint = true;
+                shouldPrint = true;// shows only negative numbers
             }
             if (shouldPrint){
                 System.out.println("---------------------------------------------------------------------------------------------------");
@@ -190,6 +196,7 @@ public class Program {
         }
     }
 
+    // opens reports menu
     public static void displayReports(){
         boolean isReportsRunning = true;
 
@@ -228,21 +235,21 @@ public class Program {
             }
         }
     }
-
+    // displays reports based on a date category
     public static void displayDates(String dateType) {
-        boolean isFound = false;
+        boolean isFound = false; // tracks if any of the matching dateTypes was found
         header(dateType);
         for (int i = transactions.size()-1;i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             boolean match = switch (dateType) {
-                case "Month To Date" -> isMonthToDate(transaction);
+                case "Month To Date" -> isMonthToDate(transaction); // check if the transaction is from this date
                 case "Previous Month" -> isPreviousMonth(transaction);
                 case "Year To Date" -> isYearToDate(transaction);
                 case "Previous Year" -> isPreviousYear(transaction);
-                default -> false;
+                default -> false; // the date type doesn't match with anything
             };
 
-            if (match) {
+            if (match) { // if transaction matches the report:
                 printTransaction(transaction);
                 isFound = true;
             }
@@ -251,15 +258,15 @@ public class Program {
             System.out.println("No matches found 😿");
         }
     }
-
+    // search transactions by vendor's name
     public static void searchByVendor(){
         header("Search By Vendor");
         String vendorName = askForText("Enter vendor name: ");
-        boolean isFound = false;
+        boolean isFound = false; // tracks if any matching vendor was found
 
         for (int i = transactions.size()-1;i >= 0; i--){
-            Transaction transaction = transactions.get(i);
-            if (transaction.getVendor().toLowerCase().contains(vendorName.toLowerCase())) {
+            Transaction transaction = transactions.get(i);// get current transaction
+            if (transaction.getVendor().toLowerCase().contains(vendorName.toLowerCase())) { // checks if the transaction contains what the user typed
                 printTransaction(transaction);
                 isFound = true;
             }
@@ -279,13 +286,14 @@ public class Program {
         String vendor = askForText("Vendor: ");
         String amountUser = askForText("Amount: ");
 
+        // I used null to mean the user  skipped this line
         boolean isFound = false;
         LocalDate startDate = null;
         LocalDate endDate = null;
-        Double amount = null;
+        Double amount = null; // Double with D because primitive double can't be null
 
         try {
-            if (!startDateUser.isEmpty()) {
+            if (!startDateUser.isEmpty()) { // if user typed a start date convert it into a LocalDate, if they skipped leave it as null
                 startDate = LocalDate.parse(startDateUser);
             }
             if (!endDateUser.isEmpty()) {
@@ -296,7 +304,7 @@ public class Program {
             }
         } catch (Exception e) {
             System.out.println("Please input the correct information 😺");
-            return; // so it will stop executing this method immediately
+            return; // even though it's a void method it will stop executing this method immediately
         }
         for (int i = transactions.size()-1;i >= 0; i--) {
             Transaction transaction = transactions.get(i);
@@ -323,9 +331,9 @@ public class Program {
         return input.nextLine();
     }
 
-    public static double getPositiveAmount() {
-        double amount = 0;
-        boolean isValid = false;
+    public static double getPositiveAmount() { // keeps asking until the user enter a positive number
+        double amount = 0; // store the amount
+        boolean isValid = false; // controls the loop
         do {
             try {
                 System.out.print("Enter the amount: ");
@@ -339,15 +347,15 @@ public class Program {
             } catch (NumberFormatException e) {
                 System.out.println("That's not a number😾Please try again");
             }
-        }  while (!isValid);
+        }  while (!isValid); // repeat the loop until input is NOT valid
 
-        return amount;
+        return amount; // returns the positive amount
     }
 
-    public static boolean saveTransaction(Transaction transaction) {
+    public static boolean saveTransaction(Transaction transaction) { // this method saves one transaction to the csv file
 
         try {
-            FileWriter fileWriter = new FileWriter("transactions.csv", true);
+            FileWriter fileWriter = new FileWriter("transactions.csv", true); // true means append the mode, so it won't overwrite
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             bufferedWriter.write(transaction.toCsv());
@@ -356,17 +364,16 @@ public class Program {
             return true;
         } catch (IOException e) {
             System.out.println("Sorry, we could not read your transaction.");
-
             return false;
         }
-
     }
 
     public static void header(String title) {
         System.out.println("═════════════════════════════════════════ " + title + " ════════════════════════════════════════════");
     }
 
-    public static boolean isMonthToDate (Transaction transaction) {
+    // date helper methods for displayDates()
+    public static boolean isMonthToDate (Transaction transaction) { //checks if a transaction happened in the current month and current year
         LocalDate today = LocalDate.now();
         LocalDate transactionDate = transaction.getDate();
 
@@ -376,7 +383,7 @@ public class Program {
     public static boolean isPreviousMonth(Transaction transaction) {
         LocalDate today = LocalDate.now();
         LocalDate transactionDate = transaction.getDate();
-        LocalDate lastMonth = today.minusMonths(1);
+        LocalDate lastMonth = today.minusMonths(1); // gets the date one month before today
 
         return transactionDate.getYear() == lastMonth.getYear() && transactionDate.getMonthValue() == lastMonth.getMonthValue();
     }
@@ -396,6 +403,7 @@ public class Program {
         return transactionDate.getYear() == lastYear.getYear();
     }
 
+    // this method checks one transaction against all custom search filters
     public static boolean matchesCustomSearch(Transaction transaction, LocalDate startDate, LocalDate endDate, String description, String vendor, Double amount) {
 
             if (startDate != null && transaction.getDate().isBefore(startDate)) {
@@ -411,9 +419,9 @@ public class Program {
                 return false;
             }
             if (amount != null && transaction.getAmount() != amount) {
-                return false;
+                return false; // it returns false if it fails in any of the filters above
             }
-            return true;
+            return true; // it returns true if transaction matches
 
     }
 
