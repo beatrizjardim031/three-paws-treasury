@@ -141,11 +141,11 @@ public class Program {
             System.out.print("Choose your option: ");
             String userCommand = input.nextLine();
             switch (userCommand.toUpperCase()) { //.toUpperCase() converts user input to uppercase
-                case "A" -> displayEntries();
+                case "A" -> displayTransactions("All");
 
-                case "D" -> displayDeposits();
+                case "D" -> displayTransactions("Deposit");
 
-                case "P" -> displayPayments();
+                case "P" -> displayTransactions("Payment");
 
                 case "R" -> displayReports();
 
@@ -158,46 +158,32 @@ public class Program {
         }
     }
 
-    public static void displayEntries(){
+    public static void displayTransactions (String choice){
+        boolean isFound = false;
 
         for(int i = transactions.size()-1;i >= 0; i--) {
+            boolean shouldPrint = false;
             Transaction transaction = transactions.get(i);
+
+            if (choice.equalsIgnoreCase("All")) {
+                shouldPrint = true;
+            }
+            else if (choice.equalsIgnoreCase("Deposit") && transaction.getAmount() > 0) {
+                shouldPrint = true;
+            }
+            else if (choice.equalsIgnoreCase("Payment") && transaction.getAmount() < 0) {
+                shouldPrint = true;
+            }
+            if (shouldPrint){
+                System.out.println("---------------------------------------------------------------------------------------------------");
+                printTransaction(transaction);
+                isFound = true;
+            }
+        }
+        if (!isFound) {
+            System.out.println("No matches found 😿");
+        } else {
             System.out.println("---------------------------------------------------------------------------------------------------");
-            printTransaction(transaction);
-        }
-        System.out.println("---------------------------------------------------------------------------------------------------");
-
-    }
-
-    public static void displayDeposits(){
-        boolean foundDeposits = false;
-        for(int i = transactions.size()-1;i >= 0; i--) {
-            Transaction transaction = transactions.get(i);
-            if (transaction.getAmount() > 0) {
-                System.out.println("---------------------------------------------------------------------------------------------------");
-                printTransaction(transaction);
-                foundDeposits = true;
-            }
-        }
-        System.out.println("---------------------------------------------------------------------------------------------------");
-        if (!foundDeposits) {
-            System.out.println("No deposits found");
-        }
-    }
-
-    public static void displayPayments(){
-        boolean foundPayments = false;
-        for(int i = transactions.size()-1;i >= 0; i--) {
-            Transaction transaction = transactions.get(i);
-            if (transaction.getAmount() < 0) {
-                System.out.println("---------------------------------------------------------------------------------------------------");
-                printTransaction(transaction);
-                foundPayments = true;
-            }
-        }
-        System.out.println("---------------------------------------------------------------------------------------------------");
-        if (!foundPayments) {
-            System.out.println("No payments found");
         }
     }
 
