@@ -25,6 +25,7 @@ public class Transaction {
     public LocalDate getDate() {
         return date;
     }
+
     public LocalTime getTime() {
         return time;
     }
@@ -46,6 +47,6 @@ public class Transaction {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = this.time.format(fmt);
 
-        return String.format("%s|%s|%s|%s|$%.2f%n", this.date, formattedTime, this.description, this.vendor, this.amount);
+        return String.format("%s|%s|%s|%s|%.2f%n", this.date, formattedTime, this.description, this.vendor, this.amount);
     }
 }

@@ -117,10 +117,10 @@ public class Program {
         boolean saved = saveTransaction(transaction);
         if (saved) {
             if (isDeposit) {
-                System.out.println("Deposit recorded!🐾\n");
+                System.out.println("\nDeposit recorded!🐾\n");
 
             } else {
-                System.out.println("Payment recorded!🐾\n");
+                System.out.println("\nPayment recorded!🐾\n");
             }
         } else {
             System.out.println("Failed to save");
