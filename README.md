@@ -124,5 +124,14 @@ Below is a screenshot of one of the prompts I used during my learning process:
 ![img_1.png](img_1.png)
 
 **I used Claude for feedback and learning guidance, but I made sure I understood the changes before applying them to my project.**
+## Credits
+
+The ASCII art used in this project was sourced from the following websites:
+
+- [ASCII Art Borders](https://www.asciiart.eu/ascii-borders/maker)
+- [ASCII Art Source menu Cat](https://www.asciiart.eu/art/ab4709c404160f65)
+- [ASCII Art Source goodbye dog](https://asciiart.website/art/4726)
+
+I used the ASCII art to make the console application feel more fun and personal.
 ### Author
 **Beatriz Jardim**

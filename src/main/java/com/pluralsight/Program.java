@@ -286,7 +286,7 @@ public class Program {
         String vendor = askForText("Vendor: ");
         String amountUser = askForText("Amount: ");
 
-        // I used null to mean the user skipped this line
+        // I used null to mean the user skipped this line, I didn't use "" because the data types below are not Strings
         boolean isFound = false;
         LocalDate startDate = null;
         LocalDate endDate = null;
